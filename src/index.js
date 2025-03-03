@@ -11,7 +11,7 @@ connectDB()
 .then(() =>{   
     app.listen(process.env.PORT || 8000 ,()=> {
         console.log(`server is starting at port: 
-            ${proces.env.PORT}`);
+            ${process.env.PORT}`);
         
     })
 })
