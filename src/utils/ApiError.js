@@ -13,11 +13,11 @@ class ApiError extends Error {
         this.errors = errors;
 
         if (stack) {
-            this.stack = stack; // Fixed typo
+            this.stack = stack; 
         } else {
             Error.captureStackTrace(this, this.constructor);
         }
     }
 }
 
-export { ApiError };
+export default ApiError;
