@@ -300,6 +300,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
        return res.status(200).json(new ApiResponse(200, channel[0], "Channel profile fetched successfully"))
     })
 
+    //get watch history
      const getWatchHistory = asyncHandler(async (req, res) => {
       const user = await User.aggregate([
         {
