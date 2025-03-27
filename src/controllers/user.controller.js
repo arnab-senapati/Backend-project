@@ -12,7 +12,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
         const user = await User.findById(userId);
         if (!user) throw new ApiError(404, "User not found");
 
-        const accessToken = user.generateAcessToken();
+        const accessToken = user.generateAccessToken();
         const refreshToken = user.generateRefreshToken();
 
         user.refreshToken = refreshToken;
@@ -139,7 +139,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       }
   
       // Generate new tokens
-      const { accessToken, newrefreshToken } = await generateAccessAndRefreshTokens(user._id);
+      const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefreshTokens(user._id);
+
   
       // Set HTTP-only cookies
       const options = {
@@ -150,10 +151,10 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       return res
         .status(200)
         .cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", newrefreshToken, options)
+        .cookie("refreshToken", newRefreshToken, options)
         .json(new ApiResponse(
           200,
-          { accessToken, freshToken: newrefreshToken },
+          { accessToken, freshToken: newRefreshToken },
           "Access token refreshed"
         ));
   
@@ -197,7 +198,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are required");
     }
     // 2️⃣ Find the user by ID and update their details
-    const user = User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
         req.user?._id,  // Find user by their ID from the request
         { $set: { fullname: fullName, email: email } }, // Update full name and email
         { new: true } // Return the updated user object
@@ -270,11 +271,13 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
           $addFields:{
             subscriberCount: {$size:"$subscribers"},
             subscribedToCount: {$size:"$subscribedTo"},
-            isSubscribed:{
-              if:{$in: [req.user?._id, "$subscribers.subscriber"]},
-              then:true,
-              else:false
-            }
+            isSubscribed: {
+              $cond: {
+                if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+                then: true,
+                else: false
+              }
+            }            
           }
         },
         {
@@ -345,7 +348,9 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       return res.status(200).json(new ApiResponse(200, user[0]?.watchHistory, "Watch history fetched successfully"))
      })
 
-export { registerUser, loginUser, logoutUser , refreshAccessToken ,
-  changeCurrentPassword , getCurrentUser , updateAccountDetails , updateuserAvatar , updateuserCoverImage , 
-  getUserChannelProfile , getWatchHistory
-};
+     export { 
+      registerUser, loginUser, logoutUser, refreshAccessToken,
+      changeCurrentPassword, getCurrentUser, updateAccountDetails, 
+      updateuserAvatar, updateuserCoverImage, getUserChannelProfile, getWatchHistory 
+    }; 
+    

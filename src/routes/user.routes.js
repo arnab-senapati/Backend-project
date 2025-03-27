@@ -1,7 +1,11 @@
 import { Router } from "express";
-import { loginUser, logoutUser, registerUser , refreshAccessToken} from "../controllers/user.controller.js";
+import { 
+    loginUser, logoutUser, registerUser, refreshAccessToken, changeCurrentPassword
+} from "../controllers/user.controller.js"; 
 import { upload } from "../middlewares/multer.middleware.js";  
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { getCurrentUser } from "../controllers/user.controller.js";
+import { updateAccountDetails, updateuserAvatar, updateuserCoverImage , getUserChannelProfile , getWatchHistory} from "../controllers/user.controller.js";
 
 const router = Router();
 
